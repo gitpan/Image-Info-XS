@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Image-Info-XS
-version:            0.1.1
+version:            0.1.2
 abstract:           Extract meta information from image files. XS implementation of Image::Info.
 author:
     - Dmitry Kosenkov <junker@front.ru>

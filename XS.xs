@@ -6,7 +6,9 @@
 
 #include "headers.h"
 
-static const BUF_SIZE = 1024;
+#include <stdio.h>
+
+static const size_t BUF_SIZE = 51200;
 
 typedef enum { 
 	UNKNOWN, 
@@ -172,7 +174,7 @@ IV get_jpeg_info(const unsigned char *data, const size_t size, HV *hash)
 {
 	unsigned long pos = 4;
 
-	int block_length = (data[pos] << 8) + data[pos + 1];
+	uint16_t block_length = (data[pos] << 8) + data[pos + 1];
 	
 	hv_store(hash, "file_media_type", 15, newSVpv("image/jpeg", 0), 0);
 	hv_store(hash, "file_ext", 8, newSVpv("jpg", 0), 0);
@@ -198,17 +200,14 @@ IV get_jpeg_info(const unsigned char *data, const size_t size, HV *hash)
 			hv_store(hash, "samples_per_pixel", 17, newSViv(num_comp), 0);
 			
 			
-			if (num_comp == 1) 
+			switch(num_comp)
 			{
-				hv_store(hash, "color_type", 10, newSVpv("Gray", 0), 0);
-			}
-			else if (num_comp == 3) 
-			{
-				hv_store(hash, "color_type", 10, newSVpv("YCbCr", 0), 0); //or RGB ?
-			}
-			else if (num_comp == 4) 
-			{
-				hv_store(hash, "color_type", 10, newSVpv("CMYK", 0), 0); //or YCCK ?
+				case 1:
+					hv_store(hash, "color_type", 10, newSVpv("Gray", 0), 0); break;
+				case 3:
+					hv_store(hash, "color_type", 10, newSVpv("YCbCr", 0), 0); break; //or RGB ?
+				case 4:
+					hv_store(hash, "color_type", 10, newSVpv("CMYK", 0), 0); break; //or YCCK ?
 			}
 			
 			return 1;
@@ -468,13 +467,13 @@ IV get_ico_info(const unsigned char *data, const size_t size, HV *hash)
 {
 	if (size > 8)
 	{
-		long pos = 4;
+		unsigned long pos = 4;
 
 
 		hv_store(hash, "file_media_type", 15, newSVpv("image/x-icon", 0), 0);
 		hv_store(hash, "file_ext", 8, newSVpv("ico", 0), 0);
 
-		unsigned long icon_count = (data[pos + 1] << 8) + data[pos];
+		uint16_t icon_count = (data[pos + 1] << 8) | data[pos];
 
 		hv_store(hash, "icon_count", 10, newSViv(icon_count), 0);
 

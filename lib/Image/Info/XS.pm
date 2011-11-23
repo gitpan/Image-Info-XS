@@ -18,7 +18,7 @@ our @EXPORT_OK = ( @all );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 require XSLoader;
 XSLoader::load('Image::Info::XS', $VERSION);
@@ -32,7 +32,7 @@ Image::Info::XS - Extract meta information from image files. XS implementation o
 
 =head1 SYNOPSIS
 
-use Image::Info qw(image_info image_type);
+  use Image::Info qw(image_info image_type);
 
   my $info = image_info('image.jpg');
   if (!$info) 
@@ -55,13 +55,13 @@ This module provide functions to extract various kind of meta information from i
 
 =head1 METHODS
 
-=head2  image_info( $file )
+image_info( $file )
 
-=head2  image_info( \$imgdata )
+image_info( \$imgdata )
 
-=head2  image_type( $file )
+image_type( $file )
 
-=head2  image_type( \$imgdata )
+image_type( \$imgdata )
 
 
 =head1 Supported Image Formats
