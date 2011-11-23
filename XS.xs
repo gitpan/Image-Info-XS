@@ -254,9 +254,7 @@ IV get_bmp_info(const unsigned char *data, const size_t size, HV *hash)
 
 IV get_gif_info(const unsigned char *data, const size_t size, HV *hash) 
 {
-//	warn("GIF INFO");
 
-	
 	if (size < sizeof(ImageInfoGIF) + 6) return 0;
 
 	ImageInfoGIF *gif = (ImageInfoGIF*) (data + 6);

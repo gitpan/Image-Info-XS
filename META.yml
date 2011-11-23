@@ -1,9 +1,9 @@
 --- #YAML:1.0
 name:               Image-Info-XS
-version:            0.1.0
-abstract:           Perl extension for blah blah blah
+version:            0.1.1
+abstract:           Extract meta information from image files. XS implementation of Image::Info.
 author:
-    - root <root@nonet>
+    - Dmitry Kosenkov <junker@front.ru>
 license:            unknown
 distribution_type:  module
 configure_requires:

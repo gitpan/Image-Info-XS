@@ -1,6 +1,6 @@
 package Image::Info::XS;
 
-#use 5.014002;
+use 5.008001;
 use strict;
 use warnings;
 
@@ -18,7 +18,7 @@ our @EXPORT_OK = ( @all );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 require XSLoader;
 XSLoader::load('Image::Info::XS', $VERSION);

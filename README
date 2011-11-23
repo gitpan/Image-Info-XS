@@ -1,4 +1,4 @@
-Image-Info-XS version 0.01
+Image-Info-XS version 0.1
 ==========================
 
 The README is used to introduce the module and provide instructions on
@@ -21,17 +21,12 @@ To install this module type the following:
    make test
    make install
 
-DEPENDENCIES
-
-This module requires these other modules and libraries:
-
-  blah blah blah
 
 COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2011 by root
+Copyright (C) 2011 by Dmitry Kosenkov
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,
