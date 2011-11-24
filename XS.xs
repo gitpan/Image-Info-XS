@@ -534,7 +534,6 @@ SV* image_info(source)
 	CODE:
 		if (SvTYPE(source) == SVt_PV)
 		{
-
 			FILE *f = fopen(SvPV_nolen(source), "r");
 			if (!f) 
 			{
@@ -549,12 +548,13 @@ SV* image_info(source)
 			
 			from_file = 1;
 		}
-		if (SvROK(source) && SvTYPE(SvRV(source)) == SVt_PV)
+		else if (SvROK(source) && SvTYPE(SvRV(source)) == SVt_PV)
 		{
 			image_data_size = SvCUR(SvRV(source));
 			image_data = SvPV_nolen(SvRV(source));
 			
 		}
+		else XSRETURN_UNDEF;
 		
 		ImageType image_type = get_image_type(image_data, image_data_size);
 		
@@ -586,7 +586,10 @@ SV* image_info(source)
 		if (result == 1) 
 			RETVAL = newRV_noinc((SV*) hash);
 		else 
+		{
+			SvREFCNT_dec((SV*) hash);
 			XSRETURN_UNDEF;
+		}
 	OUTPUT:
 		RETVAL
 
