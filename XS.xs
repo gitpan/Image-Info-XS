@@ -472,7 +472,7 @@ IV get_tiff_info(const unsigned char *data, const size_t size, HV *hash)
 		}
 	}
 	
-	hv_store(hash, "file_media_type", 15, newSVpv(" image/tiff", 0), 0);
+	hv_store(hash, "file_media_type", 15, newSVpv("image/tiff", 0), 0);
 	hv_store(hash, "file_ext", 8, newSVpv("tif", 0), 0);
 	
 	return 1;
