@@ -108,25 +108,25 @@ ImageType get_image_type(const unsigned char *data, const size_t size)
 	// 2 bytes
 	if (size >= 2)
 	{
-		if (memcmp(data, bmp_sig, 2) == 0) { return IMAGE_BMP; }
+		if (memcmp(data, bmp_sig, 2) == 0) return IMAGE_BMP; 
 	}
 
 	if (size >= 3)
 	{
-		if (memcmp(data, gif_sig, 3) == 0) { return IMAGE_GIF; }
+		if (memcmp(data, gif_sig, 3) == 0) return IMAGE_GIF;
 
-		if (memcmp(data, jpg_sig, 3) == 0) { return IMAGE_JPEG; }
+		if (memcmp(data, jpg_sig, 3) == 0) return IMAGE_JPEG; 
 	}
 
 	if (size >= 4)
 	{
-		if (memcmp(data, psd_sig, 4) == 0) { return IMAGE_PSD; }
+		if (memcmp(data, psd_sig, 4) == 0) return IMAGE_PSD;
 
-		if (memcmp(data, iitiff_sig, 4) == 0) { return IMAGE_TIFF; }
+		if (memcmp(data, iitiff_sig, 4) == 0) return IMAGE_TIFF;
 
-		if (memcmp(data, mmtiff_sig, 4) == 0) { return IMAGE_TIFF; }
+		if (memcmp(data, mmtiff_sig, 4) == 0) return IMAGE_TIFF;
 
-		if (memcmp(data, ico_sig, 4) == 0) { return IMAGE_ICO; }
+		if (memcmp(data, ico_sig, 4) == 0) return IMAGE_ICO;
 	}
 
 	if (size >= 8)
@@ -161,10 +161,10 @@ IV get_png_info(const unsigned char *data, const size_t size, HV *hash)
 	
 	hv_store(hash, "interlace", 9, newSVpv(png->interlace == 1 ? "Adam7" : "None", 0), 0);
 	
-	if (png->filter < sizeof(png_filter)/sizeof(png_filter[0]))
+	if (png->filter < sizeof(png_filter) / sizeof(png_filter[0]))
 		hv_store(hash, "filter", 6, newSVpv(png_filter[png->filter], 0), 0);
 
-	if (png->color_type < sizeof(png_color)/sizeof(png_color[0]))
+	if (png->color_type < sizeof(png_color) / sizeof(png_color[0]))
 		hv_store(hash, "color_type", 10, newSVpv(png_color[png->color_type], 0), 0);
 
 	return 1;
@@ -254,9 +254,9 @@ IV get_bmp_info(const unsigned char *data, const size_t size, HV *hash)
 IV get_gif_info(const unsigned char *data, const size_t size, HV *hash) 
 {
 
-	if (size < sizeof(ImageInfoGIF) + 6) return 0;
+	if (size < sizeof(ImageInfoGIF)) return 0;
 
-	ImageInfoGIF *gif = (ImageInfoGIF*) (data + 6);
+	ImageInfoGIF *gif = (ImageInfoGIF*) (data);
 	
 	hv_store(hash, "file_media_type", 15, newSVpv("image/gif", 0), 0);
 	hv_store(hash, "file_ext", 8, newSVpv("gif", 0), 0);
@@ -266,15 +266,31 @@ IV get_gif_info(const unsigned char *data, const size_t size, HV *hash)
 	hv_store(hash, "color_type", 10, newSVpv("Indexed", 0), 0);
 	
 	hv_store(hash, "sorted_colors", 13, newSViv((gif->Packed & 0x08) ? 1 : 0), 0);
-	hv_store(hash, "color_resolution", 16, newSViv(((gif->Packed & 0x70) >> 4) + 1), 0);
+	
+	hv_store(hash, "bits", 4, newSViv(((gif->Packed & 0x70) >> 4) + 1), 0);
+	
+	unsigned short color_table_size = 1 << ((gif->Packed & 0x07) + 1);
+	hv_store(hash, "color_table_size", 16, newSViv(color_table_size), 0);
+	
 	hv_store(hash, "background_color", 16, newSViv(gif->BackgroundColor), 0);
+	hv_store(hash, "version", 7, newSVpv(gif->Version, 3), 0);
 	
 	
 	if (gif->AspectRatio != 0)
 	{
-		double aspect_ratio = (double) ((double)(gif->AspectRatio + 15) / 64); 
+		double aspect_ratio = ((double)(gif->AspectRatio + 15) / 64); 
 		hv_store(hash, "aspect_ratio", 12, newSVnv(aspect_ratio), 0);
 	}
+	
+	int pos = sizeof(ImageInfoGIF) + (color_table_size * 3);
+	if (size > pos)
+	{
+		if (memcmp("89a", gif->Version, 3) == 0 && data[pos] == 0xF9)
+			hv_store(hash, "animated", 8, newSViv(1), 0);
+		else 
+			hv_store(hash, "animated", 8, newSViv(0), 0);
+	}
+	else return 0;
 	
 	return 1;
 }
@@ -449,7 +465,7 @@ IV get_tiff_info(const unsigned char *data, const size_t size, HV *hash)
 					}
 					break;
 				case TIFF_TAG_COLORTYPE:
-					if (tag_value <= sizeof(tiff_color)/sizeof(tiff_color[0]))
+					if (tag_value <= sizeof(tiff_color) / sizeof(tiff_color[0]))
 						hv_store(hash, "color_type", 10, newSVpv(tiff_color[tag_value], 0), 0);
 					break;
 			}

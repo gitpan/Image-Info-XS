@@ -42,11 +42,13 @@ typedef struct ImageInfoPNGStruct
 
 typedef struct ImageInfoGIFStruct
 {
-	uint16_t ScreenWidth;      /* Width of Display Screen in Pixels */
-	uint16_t ScreenHeight;     /* Height of Display Screen in Pixels */
-	uint8_t Packed;           /* Screen and Color Map Information */
-	uint8_t BackgroundColor;  /* Background Color Index */
-	uint8_t AspectRatio;      /* Pixel Aspect Ratio */
+	unsigned char Header[3];
+	unsigned char Version[3];
+	uint16_t      ScreenWidth;      /* Width of Display Screen in Pixels */
+	uint16_t      ScreenHeight;     /* Height of Display Screen in Pixels */
+	uint8_t       Packed;           /* Screen and Color Map Information */
+	uint8_t       BackgroundColor;  /* Background Color Index */
+	uint8_t       AspectRatio;      /* Pixel Aspect Ratio */
 } ImageInfoGIF;
 
 typedef struct ImageInfoPSDStruct

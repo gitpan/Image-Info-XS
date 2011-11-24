@@ -1,6 +1,5 @@
 package Image::Info::XS;
 
-use 5.008001;
 use strict;
 use warnings;
 
@@ -18,7 +17,7 @@ our @EXPORT_OK = ( @all );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 require XSLoader;
 XSLoader::load('Image::Info::XS', $VERSION);
@@ -66,13 +65,13 @@ image_type( \$imgdata )
 
 =head1 Supported Image Formats
 
-  BMP
-  GIF
-  ICO
-  JPEG
-  PNG
-  TIFF
-  PSD
+BMP
+GIF
+ICO
+JPEG
+PNG
+TIFF
+PSD
   
 
 =head1 SEE ALSO
