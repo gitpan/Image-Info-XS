@@ -9,7 +9,7 @@ use AutoLoader qw(AUTOLOAD);
 our @ISA = qw(Exporter);
 
 
-my @all = qw/image_info/;
+my @all = qw/image_info image_type/;
 
 our %EXPORT_TAGS = ( 'all' => \@all );
 
@@ -17,7 +17,7 @@ our @EXPORT_OK = ( @all );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.1.5';
+our $VERSION = '0.1.6';
 
 require XSLoader;
 XSLoader::load('Image::Info::XS', $VERSION);
@@ -31,7 +31,7 @@ Image::Info::XS - Extract meta information from image files. XS implementation o
 
 =head1 SYNOPSIS
 
-  use Image::Info qw(image_info image_type);
+  use Image::Info::XS qw(image_info image_type);
 
   my $info = image_info('image.jpg');
   if (!$info) 

@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-static const size_t BUF_SIZE = 51200;
+static const size_t BUF_SIZE = 102400;
 
 typedef enum { 
 	UNKNOWN, 
@@ -29,9 +29,9 @@ static const unsigned char  jpg_sig[3]    = { 0xFF, 0xD8, 0xFF };
 static const unsigned char  psd_sig[4]    = {'8', 'B', 'P', 'S'};
 static const unsigned char  iitiff_sig[4] = {'I', 'I', 0x2A, 0x00};
 static const unsigned char  mmtiff_sig[4] = {'M', 'M', 0x00, 0x2A};
-static const unsigned char ico_sig[8]     = { 0x00, 0x00, 0x01, 0x00};
+static const unsigned char  ico_sig[8]    = { 0x00, 0x00, 0x01, 0x00};
 
-static const unsigned char png_sig[8]    = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+static const unsigned char  png_sig[8]    = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
 
 static const char *bmp_compression[7] = {"None",
@@ -174,18 +174,20 @@ IV get_jpeg_info(const unsigned char *data, const size_t size, HV *hash)
 {
 	unsigned long pos = 4;
 
-	uint16_t block_length = (data[pos] << 8) + data[pos + 1];
+	uint16_t block_length = get_uint16(data + pos, 1);
+//	uint16_t block_length = (data[pos] << 8);
 	
 	hv_store(hash, "file_media_type", 15, newSVpv("image/jpeg", 0), 0);
 	hv_store(hash, "file_ext", 8, newSVpv("jpg", 0), 0);
+	
 	
 	while(pos < size)
 	{
 		pos += block_length;
 
-		if (pos >= size) { return 0; }
+		if (pos >= size) return 0; 
 
-		if (data[pos] != 0xFF) { return 0; }
+		if (data[pos] != 0xFF) return 0;
 		if (data[pos + 1] == 0xC0)
 		{
 			// 0xFFC0 block: [0xFFC0][ushort length][uchar precision][ushort x][ushort y]
