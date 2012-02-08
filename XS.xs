@@ -175,25 +175,62 @@ IV get_jpeg_info(const unsigned char *data, const size_t size, HV *hash)
 	unsigned long pos = 4;
 
 	uint16_t block_length = get_uint16(data + pos, 1);
-//	uint16_t block_length = (data[pos] << 8);
-	
+
 	hv_store(hash, "file_media_type", 15, newSVpv("image/jpeg", 0), 0);
 	hv_store(hash, "file_ext", 8, newSVpv("jpg", 0), 0);
 	
+	
+	short unsigned int jpeg_type = 0;
 	
 	while(pos < size)
 	{
 		pos += block_length;
 
-		if (pos >= size) return 0; 
+		warn("POS:%i SIZE:%i", pos, size);
 
+		if (pos >= size) return 0; 
 		if (data[pos] != 0xFF) return 0;
-		if (data[pos + 1] == 0xC0)
+		
+		jpeg_type = data[pos + 1];
+		
+		switch(jpeg_type)
 		{
-			// 0xFFC0 block: [0xFFC0][ushort length][uchar precision][ushort x][ushort y]
+			case JPEG_TYPE_BASELINE:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Baseline", 0), 0); break;
+			case JPEG_TYPE_EXTENDED_SEQUENTIAL:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Extended sequential", 0), 0); break;
+			case JPEG_TYPE_PROGRESSIVE:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Progressive", 0), 0); break;
+			case JPEG_TYPE_LOSSLESS:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Lossless", 0), 0); break;
+			case JPEG_TYPE_DIFFERENTIAL_SEQUENTIAL:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Differential sequential", 0), 0); break;
+			case JPEG_TYPE_DIFFERENTIAL_PROGRESSIVE:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Differential progressive", 0), 0); break;
+			case JPEG_TYPE_DIFFERENTIAL_LOSSLESS:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Differential lossless", 0), 0); break;
+			case JPEG_TYPE_EXTENDED_SEQUENTIAL_AC:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Extended sequential, arithmetic coding", 0), 0); break;
+			case JPEG_TYPE_PROGRESSIVE_AC:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Progressive, arithmetic coding", 0), 0); break;
+			case JPEG_TYPE_LOSSLESS_AC:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Lossless, arithmetic coding", 0), 0); break;
+			case JPEG_TYPE_DIFFERENTIAL_SEQUENTIAL_AC:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Differential sequential, arithmetic coding", 0), 0); break;
+			case JPEG_TYPE_DIFFERENTIAL_PROGRESSIVE_AC:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Differential progressive, arithmetic coding", 0), 0); break;
+			case JPEG_TYPE_DIFFERENTIAL_LOSSLESS_AC:  
+				hv_store(hash, "jpeg_type", 9, newSVpv("Differential lossless, arithmetic coding", 0), 0); break;
+			default:
+				jpeg_type = 0;
+		}
+
+		if (jpeg_type > 0)
+		{
+			// 0xFFC? block: [0xFFC?][ushort length][uchar precision][ushort x][ushort y]
 			uint8_t  bits     = data[pos + 4];
-			uint16_t height   = (data[pos + 5] << 8) | data[pos + 6];
-			uint16_t width    = (data[pos + 7] << 8) | data[pos + 8];
+			uint16_t height   = get_uint16(data + pos + 5, 1); 
+			uint16_t width    = get_uint16(data + pos + 7, 1); 
 			uint8_t  num_comp = data[pos + 9];
 			
 			hv_store(hash, "width", 5, newSViv(width), 0);
@@ -218,7 +255,7 @@ IV get_jpeg_info(const unsigned char *data, const size_t size, HV *hash)
 		{
 			pos += 2;
 			// Next block
-			block_length = (data[pos] << 8) + data[pos + 1];
+			block_length = get_uint16(data + pos, 1);
 		}
 	}
 
@@ -584,6 +621,7 @@ SV* image_info(source)
 		
 		if (from_file) free(image_data);
 
+		warn("RESULT: %i", result);
 		
 		if (result == 1) 
 			RETVAL = newRV_noinc((SV*) hash);

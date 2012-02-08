@@ -17,7 +17,7 @@ our @EXPORT_OK = ( @all );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.1.6';
+our $VERSION = '0.1.7';
 
 require XSLoader;
 XSLoader::load('Image::Info::XS', $VERSION);
