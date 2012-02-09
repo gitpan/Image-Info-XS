@@ -186,8 +186,6 @@ IV get_jpeg_info(const unsigned char *data, const size_t size, HV *hash)
 	{
 		pos += block_length;
 
-		warn("POS:%i SIZE:%i", pos, size);
-
 		if (pos >= size) return 0; 
 		if (data[pos] != 0xFF) return 0;
 		
@@ -620,8 +618,6 @@ SV* image_info(source)
 		}
 		
 		if (from_file) free(image_data);
-
-		warn("RESULT: %i", result);
 		
 		if (result == 1) 
 			RETVAL = newRV_noinc((SV*) hash);
